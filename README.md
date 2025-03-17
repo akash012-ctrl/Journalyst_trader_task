@@ -1,0 +1,216 @@
+# Trade Analytics Platform
+
+A comprehensive platform that integrates with multiple broker APIs, processes trade data, and provides analytics and insights using LLM technology.
+
+## Project Architecture
+
+```
+Trade Analytics Platform
+│
+├── Broker A Server (Port 3001)
+│   ├── API Endpoints
+│   │   └── /api/trades/broker-a
+│   └── MongoDB: broker-a-db
+│
+├── Broker B Server (Port 3002)
+│   ├── API Endpoints
+│   │   └── /api/trades/broker-b
+│   └── MongoDB: broker-b-db
+│
+└── Main Platform Server (Port 3000)
+    ├── API Endpoints
+    │   ├── /api/trade-logs
+    │   └── /api/analytics
+    ├── MongoDB: trade-analytics-db
+    └── OpenAI Integration
+```
+
+## Server Descriptions
+
+### 1. Broker A Server
+
+- Simulates a broker API providing trade data
+- Stores data in a MongoDB collection
+- Data Schema: `{ tradeId, symbol, quantity, price, timestamp }`
+
+### 2. Broker B Server
+
+- Simulates a different broker API with a different data format
+- Stores data in a MongoDB collection
+- Data Schema: `{ orderId, asset, amount, cost, executedAt }`
+
+### 3. Main Platform Server
+
+- Central server that integrates data from both brokers
+- Performs data transformation to a unified schema
+- Provides analytics using performance calculations and LLM insights
+- Maintains a relational database with user profiles, broker connections, and trade logs
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v14 or higher)
+- MongoDB (v4 or higher)
+- GROQ API key (for LLM integration)
+
+### Installation Steps
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd trade-analytics-platform
+```
+
+2. Set up each server:
+
+**Broker A Server:**
+
+```bash
+cd broker-a-server
+npm install
+cp .env.example .env  # Configure your environment variables
+npm run dev
+```
+
+**Broker B Server:**
+
+```bash
+cd broker-b-server
+npm install
+cp .env.example .env  # Configure your environment variables
+npm run dev
+```
+
+**Main Server:**
+
+```bash
+cd main-server
+npm install
+cp .env.example .env  # Configure your environment variables
+# Important: Add your OpenAI API key to .env file
+npm run dev
+```
+
+3. All three servers should be running concurrently.
+
+## API Endpoints
+
+### Broker A Server
+
+- `GET /api/trades/broker-a` - Get all trades from Broker A
+- `POST /api/trades/broker-a` - Add a new trade to Broker A
+- `GET /api/trades/broker-a/sample` - Get sample trade data for testing
+
+### Broker B Server
+
+- `GET /api/trades/broker-b` - Get all orders from Broker B
+- `POST /api/trades/broker-b` - Add a new order to Broker B
+- `GET /api/trades/broker-b/sample` - Get sample order data for testing
+
+### Main Platform Server
+
+- `GET /api/trade-logs` - Fetch all trade logs from both brokers in unified format
+- `POST /api/trade-logs/sync` - Sync trades from brokers and store in database
+- `GET /api/trade-logs/stored` - Get all stored trade logs from the database
+- `GET /api/analytics` - Get performance metrics and AI-generated insights
+
+## Database Schema
+
+### Main Server Database
+
+1. **User Profile**
+
+   - Username, email, password
+   - Links to broker accounts
+
+2. **Broker**
+
+   - Name, code (brokerA, brokerB)
+   - API endpoint
+   - Active status
+
+3. **Trade Logs**
+   - References to User and Broker
+   - Unified trade data (symbol, quantity, price)
+   - Original broker-specific data
+   - Analytics fields (profit/loss, win/loss, duration)
+
+## Data Flow
+
+1. **Data Collection:**
+
+   - Main server fetches data from Broker A and Broker B servers
+   - Raw data is kept in original format for reference
+
+2. **Data Transformation:**
+
+   - Broker-specific formats are transformed into a unified schema
+   - Additional metrics are calculated (profit/loss, trade duration)
+
+3. **Data Storage:**
+
+   - Transformed data is stored in the trade logs collection
+   - Relations to users and brokers are established
+
+4. **Analytics Generation:**
+
+   - Performance metrics are calculated from stored trade data
+   - Trade summary is sent to OpenAI API for insights generation
+
+5. **Insights Delivery:**
+   - Combined metrics and LLM-generated insights are returned to the user
+
+## Development Workflow
+
+1. Start all three servers in development mode
+2. Use the sample data endpoints to populate with initial test data
+3. Use `/api/trade-logs/sync` to fetch and store trade data
+4. Access analytics through the `/api/analytics` endpoint
+
+## Error Handling
+
+The platform implements centralized error handling with:
+
+- Custom middleware for consistent error responses
+- Appropriate HTTP status codes
+- Detailed error logging
+- Environment-specific error information (development vs. production)
+
+## Security Considerations
+
+- API endpoints require proper authentication (not implemented in this demo)
+- Sensitive data like passwords are properly hashed
+- API keys are stored as environment variables
+- Data validation is implemented for all inputs
+
+## Testing
+
+For testing purposes, you can:
+
+1. Use the sample data endpoints to get test data
+2. Check the synced data using the `/api/trade-logs/stored` endpoint
+3. Analyze test data with the `/api/analytics` endpoint
+
+## Data Seeding
+
+To populate the broker servers with sample data, use the seed scripts:
+
+### Seeding Broker A Server
+
+```bash
+cd broker-a-server
+node scripts/seedData.js
+```
+
+This will populate the Broker A database with 10 sample trades for stocks (AAPL, MSFT, GOOGL, etc.).
+
+### Seeding Broker B Server
+
+```bash
+cd broker-b-server
+node scripts/seedData.js
+```
+
+This will populate the Broker B database with 10 sample orders for cryptocurrencies (BTC, ETH, SOL, etc.).
