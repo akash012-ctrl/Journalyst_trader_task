@@ -1,6 +1,15 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema } from 'mongoose';
 
-const tradeSchema = new mongoose.Schema({
+// Define interface for the document
+export interface ITrade extends Document {
+    tradeId: string;
+    symbol: string;
+    quantity: number;
+    price: number;
+    timestamp: Date;
+}
+
+const tradeSchema = new Schema({
     tradeId: {
         type: String,
         required: true,
@@ -27,4 +36,4 @@ const tradeSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Trade', tradeSchema);
+export default mongoose.model<ITrade>('Trade', tradeSchema);
