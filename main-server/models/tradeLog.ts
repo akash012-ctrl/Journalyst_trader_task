@@ -1,6 +1,21 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
-const tradeLogSchema = new mongoose.Schema({
+export interface ITradeLog extends Document {
+    user: Types.ObjectId;
+    broker: Types.ObjectId;
+    tradeId: string;
+    symbol: string;
+    quantity: number;
+    price: number;
+    timestamp: Date;
+    originalData: object;
+    tradeType?: 'buy' | 'sell';
+    profitLoss?: number;
+    isWin?: boolean;
+    duration?: number;
+}
+
+const tradeLogSchema = new Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -52,4 +67,4 @@ const tradeLogSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('TradeLog', tradeLogSchema);
+export default mongoose.model<ITradeLog>('TradeLog', tradeLogSchema);

@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "lib": [
+      "es2017",
+      "esnext.asynciterable"
+    ],
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": true,
+    "strictPropertyInitialization": false,
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": [
+    "./**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

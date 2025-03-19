@@ -1,6 +1,15 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema } from 'mongoose';
 
-const orderSchema = new mongoose.Schema({
+// Define interface for the document
+export interface IOrder extends Document {
+    orderId: string;
+    asset: string;
+    amount: number;
+    cost: number;
+    executedAt: Date;
+}
+
+const orderSchema = new Schema({
     orderId: {
         type: String,
         required: true,
@@ -27,4 +36,4 @@ const orderSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+export default mongoose.model<IOrder>('Order', orderSchema);

@@ -1,12 +1,16 @@
-require('dotenv').config({ path: '../.env' });
-const mongoose = require('mongoose');
-const Trade = require('../models/trade');
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import Trade, { ITrade } from '../models/trade';
+import { Document } from 'mongoose';
+
+// Load environment variables
+dotenv.config({ path: '../.env' });
 
 // MongoDB Connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/broker-a-db';
 
 // Sample trade data
-const tradeData = [
+const tradeData: Omit<ITrade, keyof Document>[] = [
     {
         tradeId: 'A1001',
         symbol: 'AAPL',
@@ -88,7 +92,7 @@ mongoose.connect(MONGODB_URI)
     });
 
 // Seed function
-const seedDatabase = async () => {
+const seedDatabase = async (): Promise<void> => {
     try {
         // Delete existing data
         await Trade.deleteMany({});
@@ -99,11 +103,11 @@ const seedDatabase = async () => {
         console.log(`Successfully seeded ${tradeData.length} trades`);
 
         // Close connection
-        mongoose.connection.close();
+        await mongoose.connection.close();
         console.log('Database connection closed');
     } catch (error) {
         console.error('Error seeding database:', error);
-        mongoose.connection.close();
+        await mongoose.connection.close();
         process.exit(1);
     }
 };

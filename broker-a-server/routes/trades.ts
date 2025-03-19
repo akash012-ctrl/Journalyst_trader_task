@@ -1,19 +1,20 @@
-const express = require('express');
+import express, { Request, Response } from 'express';
+import Trade, { ITrade } from '../models/trade';
+
 const router = express.Router();
-const Trade = require('../models/trade');
 
 // GET all trades from Broker A
-router.get('/broker-a', async (req, res) => {
+router.get('/broker-a', async (req: Request, res: Response): Promise<void> => {
     try {
         const trades = await Trade.find();
         res.json(trades);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: (error as Error).message });
     }
 });
 
 // POST a new trade
-router.post('/broker-a', async (req, res) => {
+router.post('/broker-a', async (req: Request, res: Response): Promise<void> => {
     const trade = new Trade({
         tradeId: req.body.tradeId,
         symbol: req.body.symbol,
@@ -26,12 +27,12 @@ router.post('/broker-a', async (req, res) => {
         const newTrade = await trade.save();
         res.status(201).json(newTrade);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ message: (error as Error).message });
     }
 });
 
 // Sample data endpoint for testing
-router.get('/broker-a/sample', (req, res) => {
+router.get('/broker-a/sample', (_req: Request, res: Response): void => {
     const sampleData = [
         {
             tradeId: 'A12345',
@@ -52,4 +53,4 @@ router.get('/broker-a/sample', (req, res) => {
     res.json(sampleData);
 });
 
-module.exports = router;
+export default router;

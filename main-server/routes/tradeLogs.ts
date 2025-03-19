@@ -1,16 +1,17 @@
-const express = require('express');
+import express, { Request, Response, NextFunction } from 'express';
+import { fetchAllBrokerTrades } from '../services/brokerService';
+import TradeLog, { ITradeLog } from '../models/tradeLog';
+import { transformAllTrades, calculateTradeMetrics, TransformedTrade } from '../services/dataTransformationService';
+
 const router = express.Router();
-const brokerService = require('../services/brokerService');
-const TradeLog = require('../models/tradeLog');
-const { transformAllTrades, calculateTradeMetrics } = require('../services/dataTransformationService');
 
 /**
  * GET /api/trade-logs
  * Fetch trade logs from all brokers and return in unified format
  */
-router.get('/trade-logs', async (req, res, next) => {
+router.get('/trade-logs', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const allTrades = await brokerService.fetchAllBrokerTrades();
+        const allTrades = await fetchAllBrokerTrades();
         res.json(allTrades);
     } catch (error) {
         next(error);
@@ -21,10 +22,10 @@ router.get('/trade-logs', async (req, res, next) => {
  * POST /api/trade-logs/sync
  * Fetch and store trade logs from brokers
  */
-router.post('/trade-logs/sync', async (req, res, next) => {
+router.post('/trade-logs/sync', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         // Fetch trades from brokers
-        const allTrades = await brokerService.fetchAllBrokerTrades();
+        const allTrades = await fetchAllBrokerTrades();
 
         // Transform to unified format
         const transformedTrades = transformAllTrades(allTrades);
@@ -33,16 +34,29 @@ router.post('/trade-logs/sync', async (req, res, next) => {
         const tradesWithMetrics = calculateTradeMetrics(transformedTrades);
 
         // Save to database (simplified for this example)
-        const savedTrades = [];
+        const savedTrades: ITradeLog[] = [];
+
         for (const trade of tradesWithMetrics) {
             // Check if trade already exists
             const existingTrade = await TradeLog.findOne({
-                tradeId: trade.tradeId,
+                tradeId: trade.id,
                 brokerType: trade.brokerType
             });
 
             if (!existingTrade) {
-                const newTrade = new TradeLog(trade);
+                const newTrade = new TradeLog({
+                    tradeId: trade.id,
+                    symbol: trade.symbol,
+                    quantity: trade.quantity,
+                    price: trade.price,
+                    timestamp: trade.timestamp,
+                    originalData: trade.originalData,
+                    tradeType: trade.tradeType,
+                    profitLoss: trade.profitLoss,
+                    isWin: trade.isWin,
+                    duration: trade.duration
+                });
+
                 const savedTrade = await newTrade.save();
                 savedTrades.push(savedTrade);
             }
@@ -61,7 +75,7 @@ router.post('/trade-logs/sync', async (req, res, next) => {
  * GET /api/trade-logs/stored
  * Get all stored trade logs from database
  */
-router.get('/trade-logs/stored', async (req, res, next) => {
+router.get('/trade-logs/stored', async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const tradeLogs = await TradeLog.find()
             .populate('broker')
@@ -73,4 +87,4 @@ router.get('/trade-logs/stored', async (req, res, next) => {
     }
 });
 
-module.exports = router;
+export default router;

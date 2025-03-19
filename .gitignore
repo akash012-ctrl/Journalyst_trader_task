@@ -142,4 +142,12 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+# TypeScript output
+dist/
+*.tsbuildinfo
+
+# IDE settings
+.vscode/
+.idea/
+
 # End of https://www.toptal.com/developers/gitignore/api/node

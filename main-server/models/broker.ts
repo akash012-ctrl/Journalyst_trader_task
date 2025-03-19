@@ -1,6 +1,14 @@
-const mongoose = require('mongoose');
+import mongoose, { Document, Schema } from 'mongoose';
 
-const brokerSchema = new mongoose.Schema({
+export interface IBroker extends Document {
+    name: string;
+    code: 'brokerA' | 'brokerB';
+    apiEndpoint: string;
+    active: boolean;
+    createdAt: Date;
+}
+
+const brokerSchema = new Schema({
     name: {
         type: String,
         required: true
@@ -24,4 +32,4 @@ const brokerSchema = new mongoose.Schema({
     }
 });
 
-module.exports = mongoose.model('Broker', brokerSchema);
+export default mongoose.model<IBroker>('Broker', brokerSchema);
