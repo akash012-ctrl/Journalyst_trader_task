@@ -32,12 +32,14 @@ Trade Analytics Platform
 - Simulates a broker API providing trade data
 - Stores data in a MongoDB collection
 - Data Schema: `{ tradeId, symbol, quantity, price, timestamp }`
+- Implemented in TypeScript with type safety
 
 ### 2. Broker B Server
 
 - Simulates a different broker API with a different data format
 - Stores data in a MongoDB collection
 - Data Schema: `{ orderId, asset, amount, cost, executedAt }`
+- Implemented in TypeScript with type safety
 
 ### 3. Main Platform Server
 
@@ -45,6 +47,25 @@ Trade Analytics Platform
 - Performs data transformation to a unified schema
 - Provides analytics using performance calculations and LLM insights
 - Maintains a relational database with user profiles, broker connections, and trade logs
+- Implements type validation and guards for broker-specific data formats
+
+## Recent Updates
+
+### TypeScript Migration
+
+The platform has been migrated from JavaScript to TypeScript to enhance type safety and developer experience. Key improvements include:
+
+- Type definitions for broker-specific data formats
+- Type guards for runtime validation of incoming data
+- TypeScript interfaces for database models
+- Strong typing for API requests and responses
+- See [MIGRATION.md](./MIGRATION.md) for detailed information about the migration process
+
+### Architecture Improvements
+
+- Enhanced data validation with TypeScript-based middleware
+- Improved type safety across all server components
+- Better IDE support and code documentation through TypeScript
 
 ## Setup Instructions
 
@@ -53,6 +74,7 @@ Trade Analytics Platform
 - Node.js (v14 or higher)
 - MongoDB (v4 or higher)
 - GROQ API key (for LLM integration)
+- TypeScript (v4.5 or higher)
 
 ### Installation Steps
 
@@ -137,6 +159,40 @@ npm run dev
    - Original broker-specific data
    - Analytics fields (profit/loss, win/loss, duration)
 
+## Type Definitions
+
+The platform includes comprehensive TypeScript definitions:
+
+### Broker A Trade Type
+```typescript
+interface BrokerATrade {
+  tradeId: string;
+  symbol: string;
+  quantity: number;
+  price: number;
+  timestamp: string;
+}
+```
+
+### Broker B Trade Type
+```typescript
+interface BrokerBTrade {
+  orderId: string;
+  asset: string;
+  amount: number;
+  cost: number;
+  executedAt: string;
+}
+```
+
+### Unified Response Type
+```typescript
+interface UnifiedTradeResponse {
+  brokerA: BrokerATrade[];
+  brokerB: BrokerBTrade[];
+}
+```
+
 ## Data Flow
 
 1. **Data Collection:**
@@ -164,7 +220,15 @@ npm run dev
 
 ## Development Workflow
 
-1. Start all three servers in development mode
+1. Start all three servers in development mode:
+   ```bash
+   # For TypeScript development
+   npm run dev
+   
+   # For production (after building)
+   npm run build
+   npm start
+   ```
 2. Use the sample data endpoints to populate with initial test data
 3. Use `/api/trade-logs/sync` to fetch and store trade data
 4. Access analytics through the `/api/analytics` endpoint
@@ -177,6 +241,7 @@ The platform implements centralized error handling with:
 - Appropriate HTTP status codes
 - Detailed error logging
 - Environment-specific error information (development vs. production)
+- Type-safe error handling with TypeScript
 
 ## Security Considerations
 
@@ -184,6 +249,7 @@ The platform implements centralized error handling with:
 - Sensitive data like passwords are properly hashed
 - API keys are stored as environment variables
 - Data validation is implemented for all inputs
+- TypeScript validation enhances runtime data safety
 
 ## Testing
 
@@ -201,7 +267,8 @@ To populate the broker servers with sample data, use the seed scripts:
 
 ```bash
 cd broker-a-server
-node scripts/seedData.js
+# Using TypeScript
+npx ts-node scripts/seedData.ts
 ```
 
 This will populate the Broker A database with 10 sample trades for stocks (AAPL, MSFT, GOOGL, etc.).
@@ -210,7 +277,8 @@ This will populate the Broker A database with 10 sample trades for stocks (AAPL,
 
 ```bash
 cd broker-b-server
-node scripts/seedData.js
+# Using TypeScript
+npx ts-node scripts/seedData.ts
 ```
 
 This will populate the Broker B database with 10 sample orders for cryptocurrencies (BTC, ETH, SOL, etc.).
