@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Broker A API server for trade analytics platform",
   "main": "dist/server.js",
-  "type": "module",
   "scripts": {
     "start": "node dist/server.js",
     "dev": "ts-node-dev --respawn server.ts",
