@@ -1,26 +1,29 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import Trade, { ITrade } from '../models/trade';
+import { authenticate } from '../middlewares/authMiddleware';
 
 const router = express.Router();
 
-// GET all trades from Broker A
-router.get('/broker-a', async (req: Request, res: Response): Promise<void> => {
+// Ensure only trades belonging to the authenticated user are fetched
+router.get('/broker-a', authenticate, async (req: Request, res: Response): Promise<void> => {
     try {
-        const trades = await Trade.find();
+        const trades = await Trade.find({ userId: req.user?.userId });
         res.json(trades);
     } catch (error) {
         res.status(500).json({ message: (error as Error).message });
     }
 });
 
-// POST a new trade
-router.post('/broker-a', async (req: Request, res: Response): Promise<void> => {
+// POST a new trade with authentication
+router.post('/broker-a', authenticate, async (req: Request, res: Response): Promise<void> => {
+    // Add user ID from JWT to associate this trade with the user
     const trade = new Trade({
         tradeId: req.body.tradeId,
         symbol: req.body.symbol,
         quantity: req.body.quantity,
         price: req.body.price,
-        timestamp: req.body.timestamp || new Date()
+        timestamp: req.body.timestamp || new Date(),
+        userId: req.user?.userId // Add userId from authenticated request
     });
 
     try {
@@ -31,7 +34,7 @@ router.post('/broker-a', async (req: Request, res: Response): Promise<void> => {
     }
 });
 
-// Sample data endpoint for testing
+// Sample data endpoint for testing - no authentication for easy testing
 router.get('/broker-a/sample', (_req: Request, res: Response): void => {
     const sampleData = [
         {

@@ -119,24 +119,46 @@ npm run dev
 
 ## API Endpoints
 
-### Broker A Server
+### Authentication Endpoints
 
-- `GET /api/trades/broker-a` - Get all trades from Broker A
-- `POST /api/trades/broker-a` - Add a new trade to Broker A
-- `GET /api/trades/broker-a/sample` - Get sample trade data for testing
+- `POST /api/auth/register` - Register a new user
+  ```json
+  {
+    "username": "string",
+    "email": "string",
+    "password": "string",
+    "firstName": "string (optional)",
+    "lastName": "string (optional)",
+    "brokerCodes": ["brokerA", "brokerB"]
+  }
+  ```
 
-### Broker B Server
+- `POST /api/auth/login` - Login user
+  ```json
+  {
+    "username": "string",
+    "password": "string"
+  }
+  ```
 
-- `GET /api/trades/broker-b` - Get all orders from Broker B
-- `POST /api/trades/broker-b` - Add a new order to Broker B
-- `GET /api/trades/broker-b/sample` - Get sample order data for testing
+### Broker A Server (Protected Routes)
 
-### Main Platform Server
+- `GET /api/trades/broker-a` - Get all trades from Broker A (requires authentication)
+- `POST /api/trades/broker-a` - Add a new trade to Broker A (requires authentication)
+- `GET /api/trades/broker-a/sample` - Get sample trade data for testing (public)
 
-- `GET /api/trade-logs` - Fetch all trade logs from both brokers in unified format
-- `POST /api/trade-logs/sync` - Sync trades from brokers and store in database
-- `GET /api/trade-logs/stored` - Get all stored trade logs from the database
-- `GET /api/analytics` - Get performance metrics and AI-generated insights
+### Broker B Server (Protected Routes)
+
+- `GET /api/trades/broker-b` - Get all orders from Broker B (requires authentication)
+- `POST /api/trades/broker-b` - Add a new order to Broker B (requires authentication)
+- `GET /api/trades/broker-b/sample` - Get sample order data for testing (public)
+
+### Main Platform Server (Protected Routes)
+
+- `GET /api/trade-logs` - Fetch all trade logs from user's authorized brokers
+- `POST /api/trade-logs/sync` - Sync trades from user's authorized brokers
+- `GET /api/trade-logs/stored` - Get all stored trade logs for the authenticated user
+- `GET /api/analytics` - Get performance metrics and AI-generated insights for user's trades
 
 ## Database Schema
 
@@ -245,11 +267,39 @@ The platform implements centralized error handling with:
 
 ## Security Considerations
 
-- API endpoints require proper authentication (not implemented in this demo)
-- Sensitive data like passwords are properly hashed
+- JWT-based authentication implemented across all servers
+- Users can only access trades from brokers they are registered with
+- Tokens include user ID and authorized broker list
+- API endpoints require proper authentication token in Authorization header
+- Token validation ensures user has access to requested broker
+- Sensitive data like passwords are properly hashed using bcrypt
 - API keys are stored as environment variables
 - Data validation is implemented for all inputs
 - TypeScript validation enhances runtime data safety
+
+## Authentication Flow
+
+1. **User Registration:**
+   - User registers with username, email, password, and broker access
+   - Password is hashed using bcrypt
+   - User is stored in main server's database with broker relationships
+
+2. **User Login:**
+   - User provides username and password
+   - System validates credentials and returns JWT token
+   - Token contains user ID and list of authorized brokers
+
+3. **Accessing Protected Routes:**
+   - Client includes JWT token in Authorization header
+   - Format: `Authorization: Bearer <token>`
+   - Token is validated for authenticity and expiration
+   - User's broker access is verified for broker-specific endpoints
+
+4. **Token Security:**
+   - Tokens expire after 24 hours
+   - Same JWT secret key used across all servers
+   - Token includes only necessary user information
+   - No sensitive data stored in tokens
 
 ## Testing
 

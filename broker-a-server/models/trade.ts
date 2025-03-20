@@ -7,6 +7,7 @@ export interface ITrade extends Document {
     quantity: number;
     price: number;
     timestamp: Date;
+    userId: string; // Added userId field
 }
 
 const tradeSchema = new Schema({
@@ -31,6 +32,10 @@ const tradeSchema = new Schema({
         type: Date,
         required: true,
         default: Date.now
+    },
+    userId: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true
