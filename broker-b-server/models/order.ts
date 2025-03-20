@@ -7,6 +7,7 @@ export interface IOrder extends Document {
     amount: number;
     cost: number;
     executedAt: Date;
+    userId: string; // Added userId field
 }
 
 const orderSchema = new Schema({
@@ -31,6 +32,10 @@ const orderSchema = new Schema({
         type: Date,
         required: true,
         default: Date.now
+    },
+    userId: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true

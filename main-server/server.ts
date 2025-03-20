@@ -9,6 +9,8 @@ dotenv.config();
 // Import routes
 import tradeLogRoutes from './routes/tradeLogs';
 import analyticsRoutes from './routes/analytics';
+import authRoutes from './routes/auth';
+import { verifyToken } from './middlewares/authMiddleware';
 
 // Initialize Express
 const app = express();
@@ -23,7 +25,11 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/trade-ana
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.error('MongoDB connection error:', err));
 
+// Apply JWT authentication middleware to protected routes
+app.use('/api/trade-logs', verifyToken);
+
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api', tradeLogRoutes);
 app.use('/api', analyticsRoutes);
 

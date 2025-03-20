@@ -8,6 +8,7 @@ dotenv.config();
 
 // Import routes
 import tradeRoutes from './routes/trades';
+import { verifyToken } from './middlewares/authMiddleware';
 
 // Initialize Express
 const app = express();
@@ -16,6 +17,9 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Apply JWT authentication middleware to all routes
+app.use(verifyToken);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/broker-a-db')
